@@ -13,15 +13,23 @@ module.exports.getUsers = (req, res) => {
 };
 
 module.exports.getUser = (req, res) => {
-  User.findById(req.user._id)
-    .then((user) => res.send({ data: user }))
+  User.findById(req.params.userId)
+    .then((user) => {
+      if (user) {
+        res.send({ data: user });
+      } else {
+        res.status(Constants.NOT_FOUND).send({
+          message: Constants.NOT_FOUND_USER_WITH_ID,
+        });
+      }
+    })
     .catch((err) => {
-      if (err instanceof mongoose.Error.ValidationError) {
-        return res.status(Constants.BAD_REQUEST).send({
+      if (err instanceof mongoose.Error.CastError) {
+        res.status(Constants.BAD_REQUEST).send({
           message: Constants.NOT_FOUND_USER_ID,
         });
       } else {
-        return res.status(Constants.INTERNAL_SERVER_ERROR).send({
+        res.status(Constants.INTERNAL_SERVER_ERROR).send({
           message: Constants.SERVER_ERROR,
         });
       }
@@ -34,11 +42,11 @@ module.exports.createUser = (req, res) => {
     .then((user) => res.send({ data: user }))
     .catch((err) => {
       if (err instanceof mongoose.Error.ValidationError) {
-        return res.status(Constants.BAD_REQUEST).send({
+        res.status(Constants.BAD_REQUEST).send({
           message: Constants.CREATE_USER_INCORRECT_DATA,
         });
       } else {
-        return res.status(Constants.INTERNAL_SERVER_ERROR).send({
+        res.status(Constants.INTERNAL_SERVER_ERROR).send({
           message: Constants.SERVER_ERROR,
         });
       }
@@ -49,7 +57,7 @@ module.exports.updateProfile = (req, res) => {
   const { name, about } = req.body;
 
   User.findByIdAndUpdate(
-    req.user._id,
+    req.params.userId,
     { name, about },
     {
       new: true,
@@ -60,15 +68,15 @@ module.exports.updateProfile = (req, res) => {
     .then((user) => res.send({ data: user }))
     .catch((err) => {
       if (err instanceof mongoose.Error.ValidationError) {
-        return res.status(Constants.BAD_REQUEST).send({
+        res.status(Constants.BAD_REQUEST).send({
           message: Constants.UPDATE_PROFILE_INCORRECT_DATA,
         });
       } else if (err instanceof mongoose.Error.ValidationError) {
-        return res.status(Constants.NOT_FOUND).send({
+        res.status(Constants.NOT_FOUND).send({
           message: Constants.NOT_FOUND_USER_WITH_ID,
         });
       } else {
-        return res.status(Constants.INTERNAL_SERVER_ERROR).send({
+        res.status(Constants.INTERNAL_SERVER_ERROR).send({
           message: Constants.SERVER_ERROR,
         });
       }
@@ -79,7 +87,7 @@ module.exports.updateAvatar = (req, res) => {
   const { avatar } = req.body;
 
   User.findByIdAndUpdate(
-    req.user._id,
+    req.params.userId,
     { avatar },
     {
       new: true,
@@ -90,15 +98,15 @@ module.exports.updateAvatar = (req, res) => {
     .then((user) => res.send({ data: user }))
     .catch((err) => {
       if (err instanceof mongoose.Error.ValidationError) {
-        return res.status(Constants.BAD_REQUEST).send({
+        res.status(Constants.BAD_REQUEST).send({
           message: Constants.UPDATE_AVATAR_INCORRECT_DATA,
         });
       } else if (err instanceof mongoose.Error.ValidationError) {
-        return res.status(Constants.NOT_FOUND).send({
+        res.status(Constants.NOT_FOUND).send({
           message: Constants.NOT_FOUND_USER_WITH_ID,
         });
       } else {
-        return res.status(Constants.INTERNAL_SERVER_ERROR).send({
+        res.status(Constants.INTERNAL_SERVER_ERROR).send({
           message: Constants.SERVER_ERROR,
         });
       }

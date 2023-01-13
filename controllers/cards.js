@@ -19,11 +19,11 @@ module.exports.createCard = (req, res) => {
     .then((card) => res.send({ data: card }))
     .catch((err) => {
       if (err instanceof mongoose.Error.ValidationError) {
-        return res.status(Constants.BAD_REQUEST).send({
+        res.status(Constants.BAD_REQUEST).send({
           message: Constants.CREATE_CARD_INCORRECT_DATA,
         });
       } else {
-        return res.status(Constants.INTERNAL_SERVER_ERROR).send({
+        res.status(Constants.INTERNAL_SERVER_ERROR).send({
           message: Constants.SERVER_ERROR,
         });
       }
@@ -32,14 +32,22 @@ module.exports.createCard = (req, res) => {
 
 module.exports.deleteCard = (req, res) => {
   Card.findByIdAndRemove(req.params.cardId)
-    .then((card) => res.send({ data: card }))
+    .then((card) => {
+      if (card) {
+        res.send({ data: card });
+      } else {
+        res.status(Constants.NOT_FOUND).send({
+          message: Constants.PASSED_NON_EXISTENT_CARD_ID,
+        });
+      }
+    })
     .catch((err) => {
-      if (err instanceof mongoose.Error.ValidationError) {
-        return res.status(Constants.NOT_FOUND).send({
+      if (err instanceof mongoose.Error.CastError) {
+        res.status(Constants.BAD_REQUEST).send({
           message: Constants.NOT_FOUND_CARD_WITH_ID,
         });
       } else {
-        return res.status(Constants.INTERNAL_SERVER_ERROR).send({
+        res.status(Constants.INTERNAL_SERVER_ERROR).send({
           message: Constants.SERVER_ERROR,
         });
       }
@@ -52,18 +60,22 @@ module.exports.likeCard = (req, res) =>
     { $addToSet: { likes: req.user._id } },
     { new: true }
   )
-    .then((card) => res.send({ data: card }))
+    .then((card) => {
+      if (card) {
+        res.send({ data: card });
+      } else {
+        res.status(Constants.NOT_FOUND).send({
+          message: Constants.NOT_FOUND_CARD_WITH_ID,
+        });
+      }
+    })
     .catch((err) => {
-      if (err instanceof mongoose.Error.ValidationError) {
-        return res.status(Constants.BAD_REQUEST).send({
+      if (err instanceof mongoose.Error.CastError) {
+        res.status(Constants.BAD_REQUEST).send({
           message: Constants.LIKE_OR_DISLIKE_INCORRECT_DATA,
         });
-      } else if (err instanceof mongoose.Error.ValidationError) {
-        return res.status(Constants.NOT_FOUND).send({
-          message: Constants.PASSED_NON_EXISTENT_CARD_ID,
-        });
       } else {
-        return res.status(Constants.INTERNAL_SERVER_ERROR).send({
+        res.status(Constants.INTERNAL_SERVER_ERROR).send({
           message: Constants.SERVER_ERROR,
         });
       }
@@ -75,15 +87,19 @@ module.exports.dislikeCard = (req, res) =>
     { $pull: { likes: req.user._id } },
     { new: true }
   )
-    .then((card) => res.send({ data: card }))
+    .then((card) => {
+      if (card) {
+        res.send({ data: card });
+      } else {
+        res.status(Constants.NOT_FOUND).send({
+          message: Constants.NOT_FOUND_CARD_WITH_ID,
+        });
+      }
+    })
     .catch((err) => {
-      if (err instanceof mongoose.Error.ValidationError) {
+      if (err instanceof mongoose.Error.CastError) {
         return res.status(Constants.BAD_REQUEST).send({
           message: Constants.LIKE_OR_DISLIKE_INCORRECT_DATA,
-        });
-      } else if (err instanceof mongoose.Error.ValidationError) {
-        return res.status(Constants.NOT_FOUND).send({
-          message: Constants.PASSED_NON_EXISTENT_CARD_ID,
         });
       } else {
         return res.status(Constants.INTERNAL_SERVER_ERROR).send({

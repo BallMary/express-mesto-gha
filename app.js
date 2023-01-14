@@ -1,7 +1,7 @@
-const path = require("path");
-const express = require("express");
-const mongoose = require("mongoose");
-const bodyParser = require("body-parser");
+const path = require('path');
+const express = require('express');
+const mongoose = require('mongoose');
+const bodyParser = require('body-parser');
 
 const { PORT = 3000 } = process.env;
 const app = express();
@@ -9,22 +9,20 @@ const app = express();
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-mongoose.set("strictQuery", true);
-mongoose.connect("mongodb://localhost:27017/mestodb");
+mongoose.set('strictQuery', true);
+mongoose.connect('mongodb://localhost:27017/mestodb');
 
 app.use((req, res, next) => {
   req.user = {
-    _id: "63bc56d433eba553b6192c1e",
+    _id: '63bc56d433eba553b6192c1e',
   };
 
   next();
 });
 
-app.use("/users", require("./routes/users"));
-app.use("/cards", require("./routes/cards"));
-app.use("/", require("./routes/nonexistent"));
+app.use('/users', require('./routes/users'));
+app.use('/cards', require('./routes/cards'));
+app.use('/', require('./routes/nonexistent'));
 
-app.use(express.static(path.join(__dirname, "public")));
-app.listen(PORT, () => {
-  console.log(`http://localhost:${PORT}`);
-});
+app.use(express.static(path.join(__dirname, 'public')));
+app.listen(PORT);

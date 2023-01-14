@@ -1,6 +1,6 @@
-const router = require("express").Router();
-const { handlingPath } = require("../controllers/nonexistent");
+const router = require('express').Router();
+const { handlingPath } = require('../controllers/nonexistent');
 
-router.all("/*", handlingPath);
+router.all('/*', handlingPath);
 
 module.exports = router;

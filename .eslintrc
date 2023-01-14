@@ -7,9 +7,5 @@
         "allow": ["_id"]
       }
     ]
-  },
-  "quotes": [
-    "error",
-    "single"
-]
+  }
 }

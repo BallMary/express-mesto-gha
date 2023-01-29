@@ -1,7 +1,4 @@
 module.exports = Object.freeze({
-  BAD_REQUEST: '400',
-  NOT_FOUND: '404',
-  INTERNAL_SERVER_ERROR: '500',
   CREATE_CARD_INCORRECT_DATA:
     'Переданы некорректные данные при создании карточки',
   CREATE_USER_INCORRECT_DATA:
@@ -17,7 +14,10 @@ module.exports = Object.freeze({
     'Переданы некорректные данные для постановки/ снятия лайка',
   PASSED_NON_EXISTENT_CARD_ID: 'Передан несуществующий _id карточки',
   PAGE_NOT_FOUND: 'Страница не найдена',
-  SERVER_ERROR: 'Ой! Произошла ошибка на сервере',
   INVALID_CARD_ID: 'Передан невалидный _id карточки',
   INVALID_USER_ID: 'Передан невалидный _id пользователя',
+  DELETE_PROHIBITED: 'Удаление чужих карточек запрещено',
+  AUTHORIZATION_REQUIRED: 'Необходима авторизация',
+  USER_EXIST: 'Такой пользователь уже существует',
+  REGEXPHTTP: /^(http(s):\/\/.)[-a-zA-Z0-9:%._+~#=]{2,256}\/[-a-zA-Z0-9:%._+~#=]{2,256}/,
 });

@@ -1,59 +1,83 @@
 const mongoose = require('mongoose');
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 const Constants = require('../utils/constants');
+const NotFoundError = require('../middlewares/errors/not-found-err');
+const BadRequestError = require('../middlewares/errors/bad-request');
+const UserExistError = require('../middlewares/errors/user-exist-error');
 
-module.exports.getUsers = (req, res) => {
+module.exports.getUsers = (req, res, next) => {
   User.find({})
     .then((users) => res.send({ data: users }))
-    .catch(() => res.status(Constants.INTERNAL_SERVER_ERROR).send({
-      message: Constants.SERVER_ERROR,
-    }));
+    .catch(next);
 };
 
-module.exports.getUser = (req, res) => {
+module.exports.getUser = (req, res, next) => {
   User.findById(req.params.userId)
     .then((user) => {
       if (user) {
         res.send({ data: user });
       } else {
-        res.status(Constants.NOT_FOUND).send({
-          message: Constants.NOT_FOUND_USER_WITH_ID,
-        });
+        next(new NotFoundError(Constants.NOT_FOUND_USER_WITH_ID));
       }
     })
     .catch((err) => {
       if (err instanceof mongoose.Error.CastError) {
-        res.status(Constants.BAD_REQUEST).send({
-          message: Constants.INVALID_USER_ID,
-        });
+        next(new BadRequestError(Constants.INVALID_USER_ID));
       } else {
-        res.status(Constants.INTERNAL_SERVER_ERROR).send({
-          message: Constants.SERVER_ERROR,
-        });
+        next(err);
       }
     });
 };
 
-module.exports.createUser = (req, res) => {
-  const { name, about, avatar } = req.body;
-  User.create({ name, about, avatar })
+module.exports.login = (req, res, next) => {
+  const { email, password } = req.body;
+
+  return User.findUserByCredentials(email, password)
+    .then((user) => {
+      const token = jwt.sign(
+        { _id: user._id },
+        'super-strong-secret',
+        { expiresIn: '7d' },
+      );
+      res.send({ token });
+      res
+        .cookie('jwt', token, {
+          maxAge: 3600000,
+          httpOnly: true,
+          sameSite: true,
+        })
+        .end();
+    })
+    .catch(() => {
+      next();
+    });
+};
+
+module.exports.createUser = (req, res, next) => {
+  const {
+    name, about, avatar, email, password,
+  } = req.body;
+  bcrypt
+    .hash(password, 10)
+    .then((hash) => User.create({
+      name, about, avatar, email, password: hash,
+    }))
     .then((user) => res.send({ data: user }))
     .catch((err) => {
-      if (err instanceof mongoose.Error.ValidationError) {
-        res.status(Constants.BAD_REQUEST).send({
-          message: Constants.CREATE_USER_INCORRECT_DATA,
-        });
+      if (err.code === 11000) {
+        next(new UserExistError(Constants.USER_EXIST));
+      } else if (err instanceof mongoose.Error.ValidationError) {
+        next(new BadRequestError(Constants.CREATE_USER_INCORRECT_DATA));
       } else {
-        res.status(Constants.INTERNAL_SERVER_ERROR).send({
-          message: Constants.SERVER_ERROR,
-        });
+        next(err);
       }
     });
 };
 
-module.exports.updateProfile = (req, res) => {
+module.exports.updateProfile = (req, res, next) => {
   const { name, about } = req.body;
-
   User.findByIdAndUpdate(
     req.user._id,
     { name, about },
@@ -66,30 +90,22 @@ module.exports.updateProfile = (req, res) => {
       if (user) {
         res.send({ data: user });
       } else {
-        res.status(Constants.NOT_FOUND).send({
-          message: Constants.NOT_FOUND_USER_ID,
-        });
+        next(new NotFoundError(Constants.NOT_FOUND_USER_WITH_ID));
       }
     })
     .catch((err) => {
       if (err instanceof mongoose.Error.CastError) {
-        res.status(Constants.BAD_REQUEST).send({
-          message: Constants.INVALID_USER_ID,
-        });
+        next(new BadRequestError(Constants.INVALID_USER_ID));
       }
       if (err instanceof mongoose.Error.ValidationError) {
-        res.status(Constants.BAD_REQUEST).send({
-          message: Constants.UPDATE_PROFILE_INCORRECT_DATA,
-        });
+        next(new BadRequestError(Constants.UPDATE_PROFILE_INCORRECT_DATA));
       } else {
-        res.status(Constants.INTERNAL_SERVER_ERROR).send({
-          message: Constants.SERVER_ERROR,
-        });
+        next(err);
       }
     });
 };
 
-module.exports.updateAvatar = (req, res) => {
+module.exports.updateAvatar = (req, res, next) => {
   const { avatar } = req.body;
 
   User.findByIdAndUpdate(
@@ -104,25 +120,17 @@ module.exports.updateAvatar = (req, res) => {
       if (user) {
         res.send({ data: user });
       } else {
-        res.status(Constants.NOT_FOUND).send({
-          message: Constants.NOT_FOUND_USER_ID,
-        });
+        next(new NotFoundError(Constants.NOT_FOUND_USER_ID));
       }
     })
     .catch((err) => {
       if (err instanceof mongoose.Error.CastError) {
-        res.status(Constants.BAD_REQUEST).send({
-          message: Constants.INVALID_USER_ID,
-        });
+        next(new BadRequestError(Constants.INVALID_USER_ID));
       }
       if (err instanceof mongoose.Error.ValidationError) {
-        res.status(Constants.BAD_REQUEST).send({
-          message: Constants.UPDATE_AVATAR_INCORRECT_DATA,
-        });
+        next(new BadRequestError(Constants.UPDATE_AVATAR_INCORRECT_DATA));
       } else {
-        res.status(Constants.INTERNAL_SERVER_ERROR).send({
-          message: Constants.SERVER_ERROR,
-        });
+        next(err);
       }
     });
 };

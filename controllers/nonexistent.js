@@ -1,7 +1,6 @@
 const Constants = require('../utils/constants');
+const NotFoundError = require('../middlewares/errors/not-found-err');
 
-exports.handlingPath = (req, res) => {
-  res.status(Constants.NOT_FOUND).send({
-    message: Constants.PAGE_NOT_FOUND,
-  });
+exports.handlingPath = (req, res, next) => {
+  next(new NotFoundError(Constants.PAGE_NOT_FOUND));
 };

@@ -61,7 +61,7 @@ module.exports.likeCard = (req, res, next) => Card.findByIdAndUpdate(
     }
   })
   .catch((err) => {
-    if (err instanceof mongoose.Error.CastError) {
+    if (err instanceof mongoose.Error.ValidationError) {
       next(new BadRequestError(Constants.LIKE_OR_DISLIKE_INCORRECT_DATA));
     } else {
       next(err);
@@ -81,7 +81,7 @@ module.exports.dislikeCard = (req, res, next) => Card.findByIdAndUpdate(
     }
   })
   .catch((err) => {
-    if (err instanceof mongoose.Error.CastError) {
+    if (err instanceof mongoose.Error.ValidationError) {
       next(new BadRequestError(Constants.LIKE_OR_DISLIKE_INCORRECT_DATA));
     } else {
       next(err);

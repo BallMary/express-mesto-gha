@@ -53,7 +53,6 @@ app.use('/', require('./middlewares/errors/owner-error'));
 app.use('/', require('./middlewares/errors/unauthorized-err'));
 
 app.use((err, req, res, next) => {
-  console.log('error = ', err);
   const { statusCode = 500, message } = err;
   res
     .status(statusCode)

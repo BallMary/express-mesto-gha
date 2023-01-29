@@ -5,6 +5,6 @@ const {
 
 } = require('../controllers/me');
 
-router.get('/users', getMe);
+router.get('/', getMe);
 
 module.exports = router;

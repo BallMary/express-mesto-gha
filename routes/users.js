@@ -14,7 +14,7 @@ router.get(
   '/:userId',
   celebrate({
     params: Joi.object().keys({
-      id: Joi.string().pattern(/^[0-9a-fA-F]{24}$/),
+      userId: Joi.string().pattern(/^[0-9a-fA-F]{24}$/),
     }),
   }),
   getUser,

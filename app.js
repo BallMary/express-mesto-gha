@@ -46,6 +46,7 @@ app.use(auth);
 app.use('/users/me', require('./routes/me'));
 app.use('/users', require('./routes/users'));
 app.use('/cards', require('./routes/cards'));
+app.use('/', require('./routes/nonexistent'));
 
 app.use(errors());
 app.use((err, req, res, next) => {

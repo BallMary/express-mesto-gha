@@ -5,9 +5,9 @@ const NotFoundError = require('../middlewares/errors/not-found-err');
 const BadRequestError = require('../middlewares/errors/bad-request');
 const OwnerError = require('../middlewares/errors/owner-error');
 
-module.exports.getCards = (res, next) => {
+module.exports.getCards = (req, res, next) => {
   Card.find({})
-    .then((cards) => res.send({ data: cards }))
+    .then((cards) => res.send(cards))
     .catch(next);
 };
 

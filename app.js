@@ -4,6 +4,7 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const { celebrate, Joi } = require('celebrate');
+const { errors } = require('celebrate');
 const { login, createUser } = require('./controllers/users');
 const auth = require('./middlewares/auth');
 const Constants = require('./utils/constants');
@@ -46,12 +47,7 @@ app.use('/me', require('./routes/me'));
 app.use('/users', require('./routes/users'));
 app.use('/cards', require('./routes/cards'));
 
-app.use('/', require('./routes/nonexistent'));
-app.use('/', require('./middlewares/errors/bad-request'));
-app.use('/', require('./middlewares/errors/not-found-err'));
-app.use('/', require('./middlewares/errors/owner-error'));
-app.use('/', require('./middlewares/errors/unauthorized-err'));
-
+app.use(errors());
 app.use((err, req, res, next) => {
   const { statusCode = 500, message } = err;
   res

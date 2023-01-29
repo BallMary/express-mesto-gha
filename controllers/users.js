@@ -56,6 +56,7 @@ module.exports.login = (req, res, next) => {
 };
 
 module.exports.createUser = (req, res, next) => {
+  console.log('Зашли в функцию создания юзера');
   const {
     name, about, avatar, email, password,
   } = req.body;
@@ -66,6 +67,7 @@ module.exports.createUser = (req, res, next) => {
     }))
     .then((user) => res.send({ data: user }))
     .catch((err) => {
+      console.log(err);
       if (err.code === 11000) {
         next(new UserExistError(Constants.USER_EXIST));
       } else if (err instanceof mongoose.Error.ValidationError) {

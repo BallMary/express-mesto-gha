@@ -20,4 +20,5 @@ module.exports = Object.freeze({
   AUTHORIZATION_REQUIRED: 'Необходима авторизация',
   USER_EXIST: 'Такой пользователь уже существует',
   REGEXPHTTP: /^(http(s):\/\/.)[-a-zA-Z0-9:%._+~#=]{2,256}\/[-a-zA-Z0-9:%._+~#=]{2,256}/,
+  USER_PASS_WRONG: 'Неправильные почта или пароль',
 });

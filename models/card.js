@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const Constants = require('../utils/constants');
 
 const cardSchema = new mongoose.Schema({
   name: {
@@ -10,15 +11,21 @@ const cardSchema = new mongoose.Schema({
   link: {
     type: String,
     required: true,
+    validate: {
+      validator: (v) => Constants.REGEXPHTTP.test(v),
+      message: 'Неправильный формат ссылки',
+    },
   },
   owner: {
     type: mongoose.Schema.Types.ObjectId,
+    ref: 'user',
     required: true,
   },
   likes: [
     {
       type: mongoose.Schema.Types.ObjectId,
       default: [],
+      ref: 'user',
     },
   ],
   createdAt: {

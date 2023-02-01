@@ -31,6 +31,18 @@ module.exports.getUser = (req, res, next) => {
     });
 };
 
+module.exports.getMe = (req, res, next) => {
+  User.findById(req.user._id)
+    .then((user) => {
+      if (user) {
+        res.send({ data: user });
+      } else {
+        throw new NotFoundError(Constants.NOT_FOUND_USER_WITH_ID);
+      }
+    })
+    .catch(next);
+};
+
 module.exports.login = (req, res, next) => {
   const { email, password } = req.body;
 
@@ -42,17 +54,8 @@ module.exports.login = (req, res, next) => {
         { expiresIn: '7d' },
       );
       res.send({ token });
-      res
-        .cookie('jwt', token, {
-          maxAge: 3600000,
-          httpOnly: true,
-          sameSite: true,
-        })
-        .end();
     })
-    .catch(() => {
-      next();
-    });
+    .catch(next);
 };
 
 module.exports.createUser = (req, res, next) => {
@@ -64,13 +67,15 @@ module.exports.createUser = (req, res, next) => {
     .then((hash) => User.create({
       name, about, avatar, email, password: hash,
     }))
-    .then((userdata) => res.send({
-      name: userdata.name,
-      about: userdata.about,
-      avatar: userdata.avatar,
-      email: userdata.email,
-      _id: userdata._id,
-    }))
+    .then((userdata) => res
+      .status('201')
+      .send({
+        name: userdata.name,
+        about: userdata.about,
+        avatar: userdata.avatar,
+        email: userdata.email,
+        _id: userdata._id,
+      }))
     .catch((err) => {
       if (err.code === 11000) {
         next(new UserExistError(Constants.USER_EXIST));

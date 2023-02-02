@@ -105,9 +105,6 @@ module.exports.updateProfile = (req, res, next) => {
       }
     })
     .catch((err) => {
-      if (err instanceof mongoose.Error.CastError) {
-        next(new BadRequestError(Constants.INVALID_USER_ID));
-      }
       if (err instanceof mongoose.Error.ValidationError) {
         next(new BadRequestError(Constants.UPDATE_PROFILE_INCORRECT_DATA));
       } else {
@@ -135,9 +132,6 @@ module.exports.updateAvatar = (req, res, next) => {
       }
     })
     .catch((err) => {
-      if (err instanceof mongoose.Error.CastError) {
-        next(new BadRequestError(Constants.INVALID_USER_ID));
-      }
       if (err instanceof mongoose.Error.ValidationError) {
         next(new BadRequestError(Constants.UPDATE_AVATAR_INCORRECT_DATA));
       } else {

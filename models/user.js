@@ -41,22 +41,21 @@ const userSchema = new mongoose.Schema({
   },
 });
 
-userSchema.statics.findUserByCredentials = function (email, password, next) {
+userSchema.statics.findUserByCredentials = function (email, password) {
   return this.findOne({ email })
     .select('+password')
     .then((user) => {
       if (!user) {
-        throw new UnauthorizedError(Constants.USER_PASS_WRONG);
+        return Promise.reject(new UnauthorizedError(Constants.USER_PASS_WRONG));
       }
 
       return bcrypt.compare(password, user.password)
         .then((matched) => {
           if (!matched) {
-            throw new UnauthorizedError(Constants.USER_PASS_WRONG);
+            return Promise.reject(new UnauthorizedError(Constants.USER_PASS_WRONG));
           }
-
           return user;
-        }).catch(next);
-    }).catch(next);
+        })
+    })
 };
 module.exports = mongoose.model('user', userSchema);

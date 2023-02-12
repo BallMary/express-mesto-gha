@@ -17,7 +17,7 @@ module.exports.createCard = (req, res, next) => {
   Card.create({ name, link, owner: req.user._id })
     .then((card) => res
       .status('201')
-      .send({ data: card }))
+      .send(card))
     .catch((err) => {
       if (err instanceof mongoose.Error.ValidationError) {
         next(new BadRequestError(Constants.CREATE_CARD_INCORRECT_DATA));
@@ -34,8 +34,8 @@ module.exports.deleteCard = async (req, res, next) => {
     if (cardId === null) {
       next(new NotFoundError(Constants.NOT_FOUND_CARD_WITH_ID));
     } else if (cardId.owner.valueOf() === cardOwner) {
-      const card = await Card.findByIdAndRemove(req.params.cardId)
-         res.send({ data: card });
+      const card = await Card.findByIdAndRemove(req.params.cardId);
+      res.send(card);
     } else {
       next(new OwnerError(Constants.DELETE_PROHIBITED));
     }
@@ -48,7 +48,6 @@ module.exports.deleteCard = async (req, res, next) => {
   }
 };
 
-
 module.exports.likeCard = (req, res, next) => Card.findByIdAndUpdate(
   req.params.cardId,
   { $addToSet: { likes: req.user._id } },
@@ -56,7 +55,7 @@ module.exports.likeCard = (req, res, next) => Card.findByIdAndUpdate(
 )
   .then((card) => {
     if (card) {
-      res.send({ data: card });
+      res.send(card);
     } else {
       next(new NotFoundError(Constants.NOT_FOUND_CARD_WITH_ID));
     }
@@ -76,7 +75,7 @@ module.exports.dislikeCard = (req, res, next) => Card.findByIdAndUpdate(
 )
   .then((card) => {
     if (card) {
-      res.send({ data: card });
+      res.send(card);
     } else {
       next(new NotFoundError(Constants.NOT_FOUND_CARD_WITH_ID));
     }

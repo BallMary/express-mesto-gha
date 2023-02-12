@@ -55,7 +55,7 @@ userSchema.statics.findUserByCredentials = function (email, password) {
             return Promise.reject(new UnauthorizedError(Constants.USER_PASS_WRONG));
           }
           return user;
-        })
-    })
+        });
+    });
 };
 module.exports = mongoose.model('user', userSchema);

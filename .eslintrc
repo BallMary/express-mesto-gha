@@ -6,13 +6,6 @@
       {
         "allow": ["_id"]
       }
-    ],
-    "no-console": "off"
-  },
-  "eslintConfig": {
-    "extends": [
-      "react-app",
-      "react-app/jest"
     ]
   }
 }
